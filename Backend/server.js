@@ -20,6 +20,7 @@ const leaderboardRoutes = require('./routes/leaderboard');
 const passwordResetRoutes = require('./routes/passwordReset');
 const badgesRoutes = require('./routes/badges');
 const profileRoutes = require('./routes/profile');
+const adminRoutes = require('./routes/admin');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/actions', actionRoutes);
@@ -28,6 +29,7 @@ app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/auth/reset', passwordResetRoutes);
 app.use('/api/badges', badgesRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/admin', adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 

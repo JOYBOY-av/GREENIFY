@@ -8,7 +8,7 @@ const Donate = () => {
   return (
     <div className="max-w-2xl mx-auto px-4 py-12 animate-fade-in-up">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-extrabold text-gray-900 mb-2">💚 Support Greenify</h1>
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Support Greenify</h1>
         <p className="text-gray-500 max-w-md mx-auto">
           Greenify is a student-built, open initiative. Your support helps us keep the platform running and ad-free. Every contribution counts!
         </p>
@@ -20,7 +20,7 @@ const Donate = () => {
           <p className="text-center text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Scan QR to Donate</p>
           <div className="rounded-2xl overflow-hidden border-4 border-cyan-400 shadow-lg w-64 h-64 mx-auto">
             <img
-              src="/donate_qr.png"
+              src="/donate_qr.jpeg"
               alt="UPI QR Code for 8081704559@ptyes"
               className="w-full h-full object-cover"
             />
@@ -57,7 +57,7 @@ const Donate = () => {
         </div>
 
         <p className="text-xs text-gray-400 text-center mt-2">
-          Donations are voluntary and non-refundable. Thank you for supporting sustainable technology! 🌿
+          Donations are voluntary and non-refundable. Thank you for supporting sustainable technology!
         </p>
       </div>
     </div>

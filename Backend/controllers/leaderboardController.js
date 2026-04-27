@@ -15,8 +15,8 @@ exports.getWeekly = async (req, res) => {
 
     const buildQuery = (suffix) => `
       WITH ranked_users AS (
-        SELECT u.id, u.name, u.college, COALESCE(SUM(at.points), 0) as total_points,
-               RANK() OVER (ORDER BY COALESCE(SUM(at.points), 0) DESC) as rank
+        SELECT u.id, u.name, u.college, COALESCE(SUM(COALESCE(ua.earned_points, at.points)), 0) as total_points,
+               RANK() OVER (ORDER BY COALESCE(SUM(COALESCE(ua.earned_points, at.points)), 0) DESC) as rank
         FROM users u
         LEFT JOIN user_actions ua ON u.id = ua.user_id AND ua.logged_at >= date_trunc('week', NOW())
         LEFT JOIN action_types at ON ua.action_type_id = at.id
@@ -59,8 +59,8 @@ exports.getAllTime = async (req, res) => {
 
     const buildQuery = (suffix) => `
       WITH ranked_users AS (
-        SELECT u.id, u.name, u.college, COALESCE(SUM(at.points), 0) as total_points,
-               RANK() OVER (ORDER BY COALESCE(SUM(at.points), 0) DESC) as rank
+        SELECT u.id, u.name, u.college, COALESCE(SUM(COALESCE(ua.earned_points, at.points)), 0) as total_points,
+               RANK() OVER (ORDER BY COALESCE(SUM(COALESCE(ua.earned_points, at.points)), 0) DESC) as rank
         FROM users u
         LEFT JOIN user_actions ua ON u.id = ua.user_id
         LEFT JOIN action_types at ON ua.action_type_id = at.id

@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS user_actions (
   user_id        INT REFERENCES users(id) ON DELETE CASCADE,
   action_type_id INT REFERENCES action_types(id),
   note           TEXT,
+  earned_points  INT,
   logged_at      TIMESTAMP DEFAULT NOW()
 );
 
@@ -53,7 +54,8 @@ INSERT INTO action_types (name, description, points, icon) VALUES
   ('Used Reusable Bag',     'Avoided single-use plastic bags',           5, '🛍️'),
   ('Ate Plant-Based Meal',  'Chose vegetarian/vegan food',              12, '🥗'),
   ('Picked Up Litter',      'Collected litter from public spaces',      20, '🗑️'),
-  ('Used Public Transport', 'Took bus/metro instead of car',            12, '🚌')
+  ('Used Public Transport', 'Took bus/metro instead of car',            12, '🚌'),
+  ('Other Action',          'Custom action evaluated by AI',             0, '🌍')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO badges (name, description, icon, criteria) VALUES

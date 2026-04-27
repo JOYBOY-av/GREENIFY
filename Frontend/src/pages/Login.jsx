@@ -20,7 +20,11 @@ const Login = () => {
       const res = await api.post('/auth/login', formData);
       login(res.data.token, res.data.user);
       toast.success('Welcome back!');
-      navigate('/dashboard');
+      if (res.data.user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setErrorMsg(err.response?.data?.msg || 'Invalid Credentials');
     } finally {

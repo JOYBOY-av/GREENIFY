@@ -8,7 +8,7 @@ const Footer = () => {
 
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <img src="/logo.png" alt="Greenify Logo" className="h-8 w-8 object-contain" />
+              <img src="/logo.png" alt="Greenify Logo" className="h-15 w-15 object-contain" />
               <span className="font-bold text-green-600 text-lg">Greenify</span>
             </div>
             <p className="text-sm text-gray-400 max-w-xs">
@@ -26,10 +26,8 @@ const Footer = () => {
             </div>
           </div>
         </div>
-
         <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-sm text-gray-400">© {new Date().getFullYear()} Greenify. All rights reserved.</p>
-          <p className="text-xs text-gray-300">Built with 💚 for a greener planet</p>
         </div>
       </div>
     </footer>

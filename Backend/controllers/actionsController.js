@@ -11,7 +11,7 @@ exports.getActionTypes = async (req, res) => {
 };
 
 exports.logAction = async (req, res) => {
-  const { action_type_id, note } = req.body;
+  const { action_type_id, note, earned_points } = req.body;
   const userId = req.user.id;
 
   try {
@@ -23,13 +23,13 @@ exports.logAction = async (req, res) => {
     const actionType = actionTypeRes.rows[0];
 
     await db.query(
-      'INSERT INTO user_actions (user_id, action_type_id, note) VALUES ($1, $2, $3)',
-      [userId, action_type_id, note]
+      'INSERT INTO user_actions (user_id, action_type_id, note, earned_points) VALUES ($1, $2, $3, $4)',
+      [userId, action_type_id, note, earned_points || null]
     );
 
     const pointsRes = await db.query(`
       SELECT 
-        COALESCE(SUM(at.points), 0) as total_points, 
+        COALESCE(SUM(COALESCE(ua.earned_points, at.points)), 0) as total_points, 
         COUNT(ua.id) as actions_count,
         COUNT(ua.id) FILTER (WHERE at.name ILIKE '%Recycl%') as recycle_count,
         COUNT(ua.id) FILTER (WHERE at.name ILIKE '%Electric%') as energy_count,
@@ -92,7 +92,7 @@ exports.logAction = async (req, res) => {
 
     res.status(201).json({
       message: 'Action logged!',
-      points_earned: actionType.points,
+      points_earned: earned_points || actionType.points,
       total_points,
       new_badges: newlyEarnedBadges
     });
@@ -106,7 +106,7 @@ exports.logAction = async (req, res) => {
 exports.getMyActions = async (req, res) => {
   try {
     const result = await db.query(`
-      SELECT ua.id, ua.note, ua.logged_at, at.name, at.points, at.icon
+      SELECT ua.id, ua.note, ua.logged_at, at.name, COALESCE(ua.earned_points, at.points) as points, at.icon
       FROM user_actions ua
       JOIN action_types at ON ua.action_type_id = at.id
       WHERE ua.user_id = $1

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Phone, Mail, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Contact = () => {
@@ -33,8 +34,8 @@ const Contact = () => {
             href="tel:8081704559"
             className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-5 hover:shadow-md hover:border-green-200 transition-all"
           >
-            <div className="w-14 h-14 rounded-xl bg-green-50 flex items-center justify-center text-2xl shrink-0 group-hover:bg-green-100 transition">
-              📞
+            <div className="w-14 h-14 rounded-xl bg-green-50 flex items-center justify-center shrink-0 group-hover:bg-green-100 transition text-green-600">
+              <Phone size={24} />
             </div>
             <div>
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Mobile</p>
@@ -47,8 +48,8 @@ const Contact = () => {
             href="mailto:atharv.vaish2006@gmail.com"
             className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-5 hover:shadow-md hover:border-green-200 transition-all"
           >
-            <div className="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center text-2xl shrink-0 group-hover:bg-blue-100 transition">
-              📧
+            <div className="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 group-hover:bg-blue-100 transition text-blue-600">
+              <Mail size={24} />
             </div>
             <div>
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Email</p>
@@ -95,7 +96,11 @@ const Contact = () => {
               type="submit"
               className="w-full bg-green-600 text-white py-2.5 rounded-xl font-semibold hover:bg-green-700 transition text-sm"
             >
-              {sent ? '✅ Message Sent!' : 'Send Message'}
+              {sent ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Check size={18} /> Message Sent!
+                </span>
+              ) : 'Send Message'}
             </button>
           </form>
         </div>

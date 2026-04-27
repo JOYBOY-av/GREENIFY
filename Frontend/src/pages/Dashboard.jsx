@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext, useRef } from 'react';
+import { User, Lock, Key, Mail, Camera, CheckCircle, Star, Flame, Medal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../api/axios';
@@ -149,12 +150,13 @@ const ProfilePanel = ({ onClose }) => {
         </div>
 
         <div className="flex border-b border-gray-100">
-          {[['profile', '👤 Profile'], ['password', '🔐 Change Password']].map(([key, label]) => (
+          {[['profile', <User size={16} className="inline mr-1" />, 'Profile'], ['password', <Lock size={16} className="inline mr-1" />, 'Change Password']].map(([key, icon, label]) => (
             <button
               key={key}
               onClick={() => setActiveTab(key)}
-              className={'flex-1 py-3 text-sm font-medium transition ' + (activeTab === key ? 'text-green-700 border-b-2 border-green-600 bg-green-50/50' : 'text-gray-500 hover:text-gray-700')}
+              className={'flex-1 py-3 text-sm font-medium transition flex items-center justify-center ' + (activeTab === key ? 'text-green-700 border-b-2 border-green-600 bg-green-50/50' : 'text-gray-500 hover:text-gray-700')}
             >
+              {icon}
               {label}
             </button>
           ))}
@@ -170,7 +172,7 @@ const ProfilePanel = ({ onClose }) => {
                   <div className="w-28 h-28 rounded-full border-4 border-green-100 overflow-hidden bg-gray-100 flex items-center justify-center">
                     {photoPreview
                       ? <img src={photoPreview} alt="Profile" className="w-full h-full object-cover" />
-                      : <span className="text-5xl select-none">👤</span>
+                      : <User className="text-gray-300 w-12 h-12" />
                     }
                   </div>
                   <button
@@ -178,7 +180,7 @@ const ProfilePanel = ({ onClose }) => {
                     className="absolute bottom-0 right-0 w-9 h-9 bg-green-600 text-white rounded-full flex items-center justify-center shadow hover:bg-green-700 transition text-lg"
                     title="Change photo"
                   >
-                    📷
+                    <Camera size={20} />
                   </button>
                   <input ref={fileRef} type="file" accept="image/jpeg,image/png" className="hidden" onChange={handlePhotoChange} />
                 </div>
@@ -255,12 +257,13 @@ const ProfilePanel = ({ onClose }) => {
             <div className="space-y-5">
 
               <div className="flex gap-2 p-1 bg-gray-100 rounded-xl">
-                {[['current', '🔑 Current Password'], ['otp', '📧 Email OTP']].map(([m, label]) => (
+                {[['current', <Key size={14} className="inline mr-1" />, 'Current Password'], ['otp', <Mail size={14} className="inline mr-1" />, 'Email OTP']].map(([m, icon, label]) => (
                   <button
                     key={m}
                     onClick={() => { setPwMethod(m); setOtpStep(1); }}
-                    className={'flex-1 py-2 rounded-lg text-sm font-medium transition ' + (pwMethod === m ? 'bg-white shadow text-green-700' : 'text-gray-500 hover:text-gray-700')}
+                    className={'flex-1 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center ' + (pwMethod === m ? 'bg-white shadow text-green-700' : 'text-gray-500 hover:text-gray-700')}
                   >
+                    {icon}
                     {label}
                   </button>
                 ))}
@@ -304,7 +307,9 @@ const ProfilePanel = ({ onClose }) => {
                 <div className="space-y-4">
                   {otpStep === 1 && (
                     <div className="text-center py-4">
-                      <div className="text-4xl mb-4">📧</div>
+                    <div className="text-green-600 mb-4 flex justify-center">
+                      <Mail size={48} />
+                    </div>
                       <p className="text-gray-600 text-sm mb-6">We'll send a 6-digit OTP to your registered email address.</p>
                       <button
                         onClick={handleSendOtp}
@@ -319,7 +324,7 @@ const ProfilePanel = ({ onClose }) => {
                   {otpStep === 2 && (
                     <form onSubmit={handleOtpReset} className="space-y-4">
                       <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm text-green-800 flex items-center gap-2">
-                        <span>✅</span>
+                        <CheckCircle size={18} className="shrink-0" />
                         <span>OTP sent to <strong>{maskedEmail}</strong></span>
                       </div>
 
@@ -416,36 +421,37 @@ const Dashboard = () => {
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Welcome back, {data.user.name.split(' ')[0]}! 👋
+              Welcome back, {data.user.name.split(' ')[0]}!
             </h1>
             <p className="text-gray-500 mt-1">{data.user.college}</p>
           </div>
-          <div className="flex items-center gap-3">
-            <Link to="/log-action" className="bg-green-600 text-white px-5 py-2.5 rounded-full font-medium hover:bg-green-700 shadow-sm transition text-sm">
-              + Log Action
-            </Link>
 
-          </div>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div className="text-4xl bg-green-50 w-16 h-16 rounded-full flex items-center justify-center">⭐</div>
+            <div className="bg-green-50 w-16 h-16 rounded-full flex items-center justify-center text-green-600">
+              <Star size={32} fill="currentColor" />
+            </div>
             <div>
               <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Total Points</p>
               <p className="text-3xl font-bold text-gray-900">{data.total_points}</p>
             </div>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div className="text-4xl bg-orange-50 w-16 h-16 rounded-full flex items-center justify-center">🔥</div>
+            <div className="bg-orange-50 w-16 h-16 rounded-full flex items-center justify-center text-orange-500">
+              <Flame size={32} fill="currentColor" />
+            </div>
             <div>
               <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Active Days</p>
               <p className="text-3xl font-bold text-gray-900">{data.streak}</p>
             </div>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div className="text-4xl bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center">🏅</div>
+            <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center text-blue-600">
+              <Medal size={32} />
+            </div>
             <div>
               <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Badges Earned</p>
               <p className="text-3xl font-bold text-gray-900">{data.badges.length}</p>
@@ -481,7 +487,6 @@ const Dashboard = () => {
               ) : (
                 <div className="p-8 text-center text-gray-500">
                   <p>No actions logged yet.</p>
-                  <Link to="/log-action" className="text-green-600 font-medium hover:underline mt-2 inline-block">Log your first action!</Link>
                 </div>
               )}
             </div>
@@ -498,7 +503,7 @@ const Dashboard = () => {
                 <div className="w-14 h-14 rounded-full border-2 border-green-100 overflow-hidden bg-gray-100 flex items-center justify-center shrink-0">
                   {profilePhoto
                     ? <img src={profilePhoto} alt="Me" className="w-full h-full object-cover" />
-                    : <span className="text-2xl">👤</span>
+                    : <User className="text-gray-300 w-8 h-8" />
                   }
                 </div>
                 <div>
