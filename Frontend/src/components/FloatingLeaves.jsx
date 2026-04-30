@@ -39,7 +39,7 @@ const getEdgeBiasedLeft = (i, total) => {
 };
 
 const generateFloatingLeaves = () => {
-  const total = 6;
+  const total = 4;
   return Array.from({ length: total }).map((_, i) => ({
     id: i,
     left: getEdgeBiasedLeft(i, total),
