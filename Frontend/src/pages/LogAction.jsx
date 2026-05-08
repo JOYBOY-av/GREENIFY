@@ -1,104 +1,172 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, Info, AlertTriangle, Lightbulb } from 'lucide-react';
+import { Sparkles, Info, AlertTriangle, Image as ImageIcon, UploadCloud, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
+
+const getDeviceId = () => {
+  let deviceId = localStorage.getItem('device_id');
+  if (!deviceId) {
+    deviceId = Math.random().toString(36).substring(2, 15);
+    localStorage.setItem('device_id', deviceId);
+  }
+  return deviceId;
+};
 
 const LogAction = () => {
   const [actionTypes, setActionTypes] = useState([]);
   const [selectedAction, setSelectedAction] = useState(null);
   const [note, setNote] = useState('');
-
-  const [customActionDescription, setCustomActionDescription] = useState('');
-  const [aiResult, setAiResult] = useState(null);
-  const [analyzing, setAnalyzing] = useState(false);
+  const [proofFile, setProofFile] = useState(null);
+  const [proofPreview, setProofPreview] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const [loading, setLoading] = useState(false);
+  const [verificationResult, setVerificationResult] = useState(null);
+  const [limits, setLimits] = useState({ noProofCount: 0, noProofLimit: 3, trustScore: 100 });
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchTypes = async () => {
+    const fetchInitialData = async () => {
       try {
-        const res = await api.get('/actions/types');
-        setActionTypes(res.data);
+        const [typesRes, limitsRes] = await Promise.all([
+          api.get('/actions/types'),
+          api.get('/actions/limits').catch(() => ({ data: { noProofCount: 0, noProofLimit: 3, trustScore: 100 } }))
+        ]);
+        setActionTypes(typesRes.data);
+        setLimits(limitsRes.data);
       } catch (err) {
-        toast.error('Failed to load action categories');
+        toast.error('Failed to load action data');
       }
     };
-    fetchTypes();
+    fetchInitialData();
   }, []);
 
   const handleSelectAction = (type) => {
     setSelectedAction(type);
-    setAiResult(null);
+    setVerificationResult(null);
   };
 
-  const handleAnalyze = async (e) => {
-    if (e) e.preventDefault();
-    if (!customActionDescription.trim()) {
-      toast.error('Please describe your action');
-      return;
-    }
-    setAnalyzing(true);
-    try {
-      const res = await api.post('/actions/analyze', { description: customActionDescription });
-      setAiResult(res.data);
-    } catch (err) {
-      toast.error('Failed to analyze action. Try again.');
-    } finally {
-      setAnalyzing(false);
+  const processFile = (file) => {
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("File size should be less than 5MB");
+        return;
+      }
+
+      if (!file.type.startsWith('image/') && file.type !== 'application/pdf') {
+        toast.error("Please upload an image or PDF");
+        return;
+      }
+      setProofFile(file);
+      setProofPreview(URL.createObjectURL(file));
+      setVerificationResult(null);
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleFileChange = (e) => {
+    processFile(e.target.files[0]);
+  };
+
+  const handleDragOver = (e) => {
     e.preventDefault();
+    setIsDragging(true);
+  };
 
-    if (selectedAction?.name === 'Other Action' && !aiResult) {
-      return handleAnalyze();
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processFile(e.dataTransfer.files[0]);
+      e.dataTransfer.clearData();
     }
+  };
+
+  const removeFile = () => {
+    setProofFile(null);
+    setProofPreview(null);
+  };
+
+  const handleSubmit = async (e, withProof) => {
+    e.preventDefault();
 
     if (!selectedAction) {
       toast.error('Please select an action type');
       return;
     }
 
+    if (selectedAction.name === 'Other Action' && !note.trim()) {
+      toast.error('Please describe your custom action');
+      return;
+    }
+
+    if (withProof && !proofFile) {
+      toast.error('Please upload an image to submit with proof');
+      return;
+    }
+
     setLoading(true);
+    setVerificationResult(null);
+
+    const formData = new FormData();
+    formData.append('action_type_id', selectedAction.id);
+    formData.append('note', note);
+    formData.append('device_id', getDeviceId());
+    
+    if (withProof && proofFile) {
+      formData.append('proof', proofFile);
+    }
+
     try {
-      const res = await api.post('/actions', {
-        action_type_id: selectedAction.id,
-        note: selectedAction.name === 'Other Action' ? customActionDescription : note,
-        earned_points: aiResult?.points
+      const res = await api.post('/verify', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
-      toast.success(`+${res.data.points_earned} Points! ${res.data.message}`);
+      const data = res.data;
+      setVerificationResult(data);
 
-      if (res.data.new_badges && res.data.new_badges.length > 0) {
-        res.data.new_badges.forEach(badge => {
-          toast.success(`🏆 New Badge Unlocked: ${badge.name}`, { duration: 5000, icon: badge.icon });
-        });
+      if (data.status === 'verified') {
+        toast.success(`+${data.points_awarded} Points Verified!`);
+        if (data.new_badges && data.new_badges.length > 0) {
+          data.new_badges.forEach(badge => {
+            toast.success(`🏆 New Badge Unlocked: ${badge.name}`, { duration: 5000, icon: badge.icon });
+          });
+        }
+
+        if (!proofFile) {
+          setLimits(prev => ({ ...prev, noProofCount: prev.noProofCount + 1 }));
+        }
+        setTimeout(() => navigate('/dashboard'), 3000);
+      } else if (data.status === 'needs_more_evidence') {
+        toast.error('We need clearer evidence to verify this.');
+      } else if (data.status === 'rejected') {
+        toast.error('Action rejected.');
       }
-
-      navigate('/dashboard');
     } catch (err) {
-      toast.error('Failed to log action');
+      if (err.response && err.response.data && err.response.data.explanation) {
+        toast.error(err.response.data.explanation);
+        setVerificationResult({
+          status: 'rejected',
+          explanation: err.response.data.explanation
+        });
+      } else {
+        toast.error('Failed to log action due to a server error.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const getButtonText = () => {
-    if (loading) return 'Logging...';
-    if (analyzing) return 'Analyzing...';
-    if (selectedAction?.name === 'Other Action') {
-      return aiResult ? 'Confirm & Log Action' : 'Analyze Action';
-    }
-    return 'Log Action & Earn Points';
-  };
-
-  const isSubmitDisabled = () => {
-    if (loading || analyzing || !selectedAction) return true;
-    if (selectedAction?.name === 'Other Action' && !aiResult && !customActionDescription.trim()) return true;
-    return false;
+    if (loading) return 'Verifying...';
+    return 'Submit for Verification';
   };
 
   return (
@@ -121,7 +189,7 @@ const LogAction = () => {
                 <div className="text-4xl mb-2">{type.icon}</div>
                 <h3 className="text-sm font-semibold text-gray-900 leading-tight mb-1">{type.name}</h3>
                 {type.name !== 'Other Action' ? (
-                  <p className="text-xs text-green-600 font-medium">+{type.points} pts</p>
+                  <p className="text-xs text-green-600 font-medium">Up to +{type.points} pts</p>
                 ) : (
                   <p className="text-xs text-green-600 font-medium">AI Evaluated</p>
                 )}
@@ -130,81 +198,133 @@ const LogAction = () => {
           </div>
         </div>
 
-        {selectedAction?.name === 'Other Action' ? (
-          <div className="mt-6 animate-fade-in">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Describe your custom eco-action in detail
-            </label>
-            <textarea
-              rows="4"
-              value={customActionDescription}
-              onChange={(e) => setCustomActionDescription(e.target.value)}
-              placeholder="e.g. Organized a community cleanup drive at the local park and collected 5 bags of trash."
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm"
-              disabled={analyzing || !!aiResult}
-            />
-          </div>
-        ) : (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Add a note (Optional)
-            </label>
-            <textarea
-              rows="3"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="e.g. Rode my bike to campus instead of driving"
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm"
-            />
-          </div>
-        )}
+        {(selectedAction) && (
+          <div className="mt-6 animate-fade-in space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {selectedAction.name === 'Other Action' ? 'Describe your custom eco-action in detail *' : 'Add a note (Optional)'}
+              </label>
+              <textarea
+                rows="3"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder={selectedAction.name === 'Other Action' ? "e.g. Organized a community cleanup drive at the local park..." : "e.g. Rode my bike to campus instead of driving"}
+                className="w-full rounded-xl border border-gray-300 px-4 py-3 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm"
+              />
+            </div>
 
-        {aiResult && (
-          <div className="mt-6 p-6 rounded-xl border-2 bg-white animate-fade-in shadow-sm border-green-200">
-            <h3 className="text-xl font-bold text-green-900 mb-4 flex items-center">
-              AI Analysis Result
-              {aiResult.category === 'eco_friendly' && <Sparkles className="ml-2 text-green-500 w-5 h-5" />}
-              {aiResult.category === 'neutral' && <Info className="ml-2 text-yellow-500 w-5 h-5" />}
-              {aiResult.category === 'harmful' && <AlertTriangle className="ml-2 text-red-500 w-5 h-5" />}
-            </h3>
-
-            <p className="text-gray-700 mb-4 text-base font-medium">{aiResult.description || aiResult.message}</p>
-
-            {aiResult.category === 'eco_friendly' && (
-              <div className="bg-green-50 p-4 rounded-lg mb-4 border border-green-100 flex items-center">
-                <p className="text-green-800 font-bold text-lg">Points Awarded: +{aiResult.points}</p>
-              </div>
-            )}
-
-            {aiResult.suggestion && (
-              <div className="bg-orange-50 p-4 rounded-lg border border-orange-100">
-                <p className="text-orange-800 font-medium flex items-start">
-                  <Lightbulb size={18} className="mr-2 shrink-0 mt-0.5" />
-                  <span>{aiResult.suggestion}</span>
-                </p>
-              </div>
-            )}
-
-            <div className="mt-4 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setAiResult(null)}
-                className="text-sm text-gray-500 hover:text-gray-700 underline"
-              >
-                Edit Description
-              </button>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Upload Proof (Optional but recommended)
+              </label>
+              {!proofPreview ? (
+                <div 
+                  className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-xl transition cursor-pointer relative ${
+                    isDragging ? 'border-green-500 bg-green-50' : 'border-gray-300 hover:border-green-400'
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => document.getElementById('file-upload').click()}
+                >
+                  <div className="space-y-1 text-center">
+                    <UploadCloud className={`mx-auto h-12 w-12 ${isDragging ? 'text-green-500' : 'text-gray-400'}`} />
+                    <div className="flex text-sm text-gray-600 justify-center">
+                      <label htmlFor="file-upload" className="relative cursor-pointer bg-transparent rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none" onClick={(e) => e.stopPropagation()}>
+                        <span>Upload a file</span>
+                        <input id="file-upload" name="file-upload" type="file" className="sr-only" accept="image/*,.pdf" onChange={handleFileChange} />
+                      </label>
+                      <p className="pl-1">or drag and drop</p>
+                    </div>
+                    <p className="text-xs text-gray-500">PNG, JPG, PDF up to 5MB</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative mt-2 rounded-xl overflow-hidden border border-gray-200 inline-block">
+                  {proofFile?.type?.includes('pdf') ? (
+                    <div className="p-8 bg-gray-50 flex flex-col items-center justify-center">
+                      <ImageIcon className="h-12 w-12 text-gray-400 mb-2" />
+                      <span className="text-sm font-medium text-gray-700">{proofFile.name}</span>
+                    </div>
+                  ) : (
+                    <img src={proofPreview} alt="Proof preview" className="max-h-64 object-contain" />
+                  )}
+                  <button
+                    type="button"
+                    onClick={removeFile}
+                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-sm"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        <div className="flex justify-center">
+        {verificationResult && (
+          <div className={`mt-6 p-6 rounded-xl border-2 shadow-sm animate-fade-in ${
+            verificationResult.status === 'verified' ? 'border-green-200 bg-green-50' :
+            verificationResult.status === 'needs_more_evidence' ? 'border-yellow-200 bg-yellow-50' :
+            'border-red-200 bg-red-50'
+          }`}>
+            <h3 className={`text-xl font-bold mb-4 flex items-center ${
+              verificationResult.status === 'verified' ? 'text-green-900' :
+              verificationResult.status === 'needs_more_evidence' ? 'text-yellow-900' :
+              'text-red-900'
+            }`}>
+              {verificationResult.status === 'verified' ? 'Action Verified!' :
+               verificationResult.status === 'needs_more_evidence' ? 'More Evidence Needed' :
+               'Action Rejected'}
+              
+              {verificationResult.status === 'verified' && <Sparkles className="ml-2 text-green-500 w-5 h-5" />}
+              {verificationResult.status === 'needs_more_evidence' && <Info className="ml-2 text-yellow-500 w-5 h-5" />}
+              {verificationResult.status === 'rejected' && <AlertTriangle className="ml-2 text-red-500 w-5 h-5" />}
+            </h3>
+
+            <p className="text-gray-700 mb-4 text-base font-medium">{verificationResult.explanation}</p>
+
+            {verificationResult.status === 'verified' && (
+              <div className="bg-white p-4 rounded-lg mb-2 border border-green-100 flex items-center">
+                <p className="text-green-800 font-bold text-lg">Points Awarded: +{verificationResult.points_awarded}</p>
+              </div>
+            )}
+            
+            <p className="text-sm text-gray-500 mt-2">
+              Verification Confidence: {verificationResult.confidence_score}%
+            </p>
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
           <button
-            type="submit"
-            disabled={isSubmitDisabled()}
-            className="bg-green-600 text-white px-10 py-3 rounded-full font-bold text-lg hover:bg-green-700 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+            type="button"
+            onClick={(e) => handleSubmit(e, true)}
+            disabled={loading || !selectedAction}
+            className="bg-green-600 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-green-700 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {getButtonText()}
+            {loading ? 'Verifying...' : 'Submit with Proof'}
           </button>
+          
+          <div className="relative group inline-block">
+            <button
+              type="button"
+              onClick={(e) => handleSubmit(e, false)}
+              disabled={loading || !selectedAction || limits.noProofCount >= limits.noProofLimit || limits.trustScore < 50}
+              className="bg-gray-800 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-gray-900 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Submitting...' : 'Submit without Proof'}
+            </button>
+            
+            {(!loading && selectedAction && (limits.noProofCount >= limits.noProofLimit || limits.trustScore < 50)) && (
+              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-max max-w-xs bg-gray-900 text-white text-xs rounded py-1 px-2 shadow-lg z-10 text-center">
+                {limits.trustScore < 50 
+                  ? "Your trust score is too low to submit without proof." 
+                  : `Daily limit of ${limits.noProofLimit} actions without proof reached.`}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
+              </div>
+            )}
+          </div>
         </div>
       </form>
     </div>

@@ -12,6 +12,9 @@ const transporter = nodemailer.createTransport({
 });
 
 exports.register = async (req, res) => {
+  if (!req.body) {
+    return res.status(400).json({ msg: 'Request body is missing' });
+  }
   const { name, email, college, password } = req.body;
 
   try {
@@ -65,6 +68,9 @@ exports.register = async (req, res) => {
 };
 
 exports.verifySignup = async (req, res) => {
+  if (!req.body) {
+    return res.status(400).json({ msg: 'Request body is missing' });
+  }
   const { email, otp } = req.body;
 
   try {
@@ -106,6 +112,9 @@ exports.verifySignup = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
+  if (!req.body) {
+    return res.status(400).json({ msg: 'Request body is missing' });
+  }
   const { email, password } = req.body;
 
   try {

@@ -12,6 +12,9 @@ const transporter = nodemailer.createTransport({
 });
 
 exports.forgotPassword = async (req, res) => {
+  if (!req.body) {
+    return res.status(400).json({ msg: 'Request body is missing' });
+  }
   const { email } = req.body;
   try {
     const userResult = await db.query('SELECT id, name FROM users WHERE email = $1', [email]);
@@ -48,6 +51,9 @@ exports.forgotPassword = async (req, res) => {
 };
 
 exports.verifyOtp = async (req, res) => {
+  if (!req.body) {
+    return res.status(400).json({ msg: 'Request body is missing' });
+  }
   const { email, otp } = req.body;
   try {
     const userResult = await db.query(
@@ -67,6 +73,9 @@ exports.verifyOtp = async (req, res) => {
 };
 
 exports.resetPassword = async (req, res) => {
+  if (!req.body) {
+    return res.status(400).json({ msg: 'Request body is missing' });
+  }
   const { email, otp, newPassword } = req.body;
   try {
     const userResult = await db.query(

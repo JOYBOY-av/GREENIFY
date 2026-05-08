@@ -9,5 +9,6 @@ router.get('/types', auth, actionsController.getActionTypes);
 router.post('/analyze', auth, aiController.analyzeAction);
 router.post('/', auth, actionsController.logAction);
 router.get('/my', auth, actionsController.getMyActions);
+router.get('/limits', auth, actionsController.getLimits);
 
 module.exports = router;

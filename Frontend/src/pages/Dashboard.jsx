@@ -384,7 +384,6 @@ const ProfilePanel = ({ onClose }) => {
   );
 };
 
-// ─── Dashboard Page ───────────────────────────────────────────────────────────
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
   const [data, setData] = useState(null);
@@ -405,7 +404,6 @@ const Dashboard = () => {
     };
     fetchDashboard();
 
-    // Load profile photo
     api.get('/profile').then(r => setProfilePhoto(r.data.profile_photo || null)).catch(() => {});
   }, []);
 
@@ -417,7 +415,7 @@ const Dashboard = () => {
       {showProfile && <ProfilePanel onClose={() => setShowProfile(false)} />}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-bloom opacity-0">
-        {/* Header */}
+        
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
@@ -428,7 +426,7 @@ const Dashboard = () => {
 
         </div>
 
-        {/* Stats */}
+        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
             <div className="bg-green-50 w-16 h-16 rounded-full flex items-center justify-center text-green-600">
@@ -459,31 +457,59 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Content Grid */}
+        
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Actions</h2>
             <div className="bg-white shadow-sm border border-gray-100 rounded-2xl overflow-hidden">
               {data.recent_actions.length > 0 ? (
-                <ul className="divide-y divide-gray-100">
-                  {data.recent_actions.map(action => (
-                    <li key={action.id} className="p-4 sm:px-6 hover:bg-gray-50 transition">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <span className="text-2xl">{action.icon}</span>
+                <div>
+                  <ul className="divide-y divide-gray-100">
+                    {data.recent_actions.map(action => (
+                      <li key={action.id} className="p-4 sm:px-6 hover:bg-gray-50 transition">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <span className="text-2xl">{action.icon}</span>
+                            <div>
+                              <p className="font-medium text-gray-900">{action.name}</p>
+                              <p className="text-sm text-gray-500">{new Date(action.logged_at).toLocaleDateString()}</p>
+                            </div>
+                          </div>
                           <div>
-                            <p className="font-medium text-gray-900">{action.name}</p>
-                            <p className="text-sm text-gray-500">{new Date(action.logged_at).toLocaleDateString()}</p>
+                            {action.status === 'rejected' ? (
+                              <div className="font-bold text-red-600 bg-red-50 px-3 py-1 rounded-full text-sm">
+                                Rejected
+                              </div>
+                            ) : action.status === 'needs_more_evidence' ? (
+                              <div className="font-bold text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full text-sm">
+                                Needs Proof
+                              </div>
+                            ) : action.status === 'processing' ? (
+                              <div className="font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
+                                Processing
+                              </div>
+                            ) : (
+                              <div className="font-bold text-green-600 bg-green-50 px-3 py-1 rounded-full text-sm">
+                                +{action.points} pts
+                              </div>
+                            )}
                           </div>
                         </div>
-                        <div className="font-bold text-green-600 bg-green-50 px-3 py-1 rounded-full text-sm">
-                          +{action.points} pts
-                        </div>
-                      </div>
-                      {action.note && <p className="mt-2 text-sm text-gray-600 ml-10 italic">"{action.note}"</p>}
-                    </li>
-                  ))}
-                </ul>
+                        {action.note && <p className="mt-2 text-sm text-gray-600 ml-10 italic">"{action.note}"</p>}
+                        {(action.status === 'rejected' || action.status === 'needs_more_evidence') && action.ai_explanation && (
+                          <div className="mt-2 ml-10 text-xs text-red-500 bg-red-50 p-2 rounded border border-red-100">
+                            <strong>Reason:</strong> {action.ai_explanation}
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="p-4 border-t border-gray-100 text-center bg-gray-50 hover:bg-gray-100 transition">
+                    <Link to="/my-actions" className="text-sm font-bold text-green-600 hover:text-green-700">
+                      View All My Actions &rarr;
+                    </Link>
+                  </div>
+                </div>
               ) : (
                 <div className="p-8 text-center text-gray-500">
                   <p>No actions logged yet.</p>
@@ -493,7 +519,7 @@ const Dashboard = () => {
           </div>
 
           <div>
-            {/* Quick Profile Card */}
+            
             <div className="mb-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Your Profile</h2>
               <button

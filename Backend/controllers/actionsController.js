@@ -106,14 +106,35 @@ exports.logAction = async (req, res) => {
 exports.getMyActions = async (req, res) => {
   try {
     const result = await db.query(`
-      SELECT ua.id, ua.note, ua.logged_at, at.name, COALESCE(ua.earned_points, at.points) as points, at.icon
+      SELECT ua.id, ua.note, ua.logged_at, ua.status, ua.ai_explanation, at.name, COALESCE(ua.earned_points, at.points) as points, at.icon
       FROM user_actions ua
       JOIN action_types at ON ua.action_type_id = at.id
       WHERE ua.user_id = $1
       ORDER BY ua.logged_at DESC
-      LIMIT 10
+      LIMIT 100
     `, [req.user.id]);
     res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+};
+
+exports.getLimits = async (req, res) => {
+  try {
+    const noProofRes = await db.query(`
+      SELECT COUNT(*) as count FROM user_actions 
+      WHERE user_id = $1 AND proof_url IS NULL AND status IN ('verified', 'needs_more_evidence', 'processing') AND logged_at > NOW() - INTERVAL '1 day'
+    `, [req.user.id]);
+    
+    const userRes = await db.query('SELECT trust_score FROM users WHERE id = $1', [req.user.id]);
+    const trustScore = userRes.rows[0]?.trust_score || 100;
+    
+    res.json({
+      noProofCount: parseInt(noProofRes.rows[0].count),
+      noProofLimit: 3,
+      trustScore
+    });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');

@@ -5,6 +5,10 @@ CREATE TABLE IF NOT EXISTS users (
   email       VARCHAR(150) UNIQUE NOT NULL,
   college     VARCHAR(150),
   password    VARCHAR(255) NOT NULL,        -- bcrypt hash
+  trust_score INT DEFAULT 100,
+  is_verified BOOLEAN DEFAULT FALSE,
+  reset_otp   VARCHAR(10),
+  reset_otp_expires TIMESTAMP,
   created_at  TIMESTAMP DEFAULT NOW()
 );
 
@@ -24,7 +28,29 @@ CREATE TABLE IF NOT EXISTS user_actions (
   action_type_id INT REFERENCES action_types(id),
   note           TEXT,
   earned_points  INT,
+  status         VARCHAR(50) DEFAULT 'submitted',
+  proof_url      VARCHAR(255),
+  proof_hash     VARCHAR(255),
+  phash          VARCHAR(255),
+  ip_address     VARCHAR(100),
+  device_id      VARCHAR(100),
+  confidence_score INT,
+  ai_explanation TEXT,
+  metadata       JSONB,
   logged_at      TIMESTAMP DEFAULT NOW()
+);
+
+-- Indices for performance on limit queries
+CREATE INDEX IF NOT EXISTS idx_user_actions_limits ON user_actions(user_id, status, logged_at);
+CREATE INDEX IF NOT EXISTS idx_user_actions_ip ON user_actions(ip_address, logged_at);
+
+-- Action Reviews
+CREATE TABLE IF NOT EXISTS action_reviews (
+  id SERIAL PRIMARY KEY,
+  action_id INT REFERENCES user_actions(id) ON DELETE CASCADE,
+  rule_triggered VARCHAR(255),
+  reviewer VARCHAR(100) DEFAULT 'system',
+  created_at TIMESTAMP DEFAULT NOW()
 );
 
 -- Badges definition
@@ -33,7 +59,9 @@ CREATE TABLE IF NOT EXISTS badges (
   name        VARCHAR(100) NOT NULL,
   description TEXT,
   icon        VARCHAR(50),
-  criteria    VARCHAR(100)
+  criteria    VARCHAR(100),
+  category    VARCHAR(50),
+  level       INT
 );
 
 -- Badges earned by users

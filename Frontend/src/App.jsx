@@ -14,6 +14,7 @@ import Dashboard from './pages/Dashboard';
 import LogAction from './pages/LogAction';
 import Leaderboard from './pages/Leaderboard';
 import Badges from './pages/Badges';
+import MyActions from './pages/MyActions';
 import ForgotPassword from './pages/ForgotPassword';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
@@ -58,6 +59,7 @@ function App() {
                     <Route path="/log-action"     element={<ProtectedRoute><LogAction /></ProtectedRoute>} />
                     <Route path="/leaderboard"    element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
                     <Route path="/badges"         element={<ProtectedRoute><Badges /></ProtectedRoute>} />
+                    <Route path="/my-actions"     element={<ProtectedRoute><MyActions /></ProtectedRoute>} />
                     <Route path="/learn-more"     element={<LearnMore />} />
                     <Route path="/terms"          element={<Terms />} />
                     <Route path="/privacy"        element={<Privacy />} />

@@ -17,7 +17,7 @@ exports.getDashboard = async (req, res) => {
     const total_points = parseInt(pointsRes.rows[0].total_points || 0);
 
     const recentRes = await db.query(`
-      SELECT ua.id, ua.note, ua.logged_at, at.name, COALESCE(ua.earned_points, at.points) as points, at.icon
+      SELECT ua.id, ua.note, ua.logged_at, ua.status, ua.ai_explanation, at.name, COALESCE(ua.earned_points, at.points) as points, at.icon
       FROM user_actions ua
       JOIN action_types at ON ua.action_type_id = at.id
       WHERE ua.user_id = $1
