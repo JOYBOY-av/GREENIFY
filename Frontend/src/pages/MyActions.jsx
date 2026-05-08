@@ -32,7 +32,7 @@ const MyActions = () => {
         <h1 className="text-2xl font-bold text-gray-900">My Actions</h1>
       </div>
 
-      <div className="bg-white shadow-sm border border-gray-100 rounded-2xl overflow-hidden">
+      <div className="bg-emerald-50/80 shadow-sm border border-emerald-100 rounded-2xl overflow-hidden backdrop-blur-sm">
         {actions.length > 0 ? (
           <ul className="divide-y divide-gray-100">
             {actions.map(action => (

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAdmin } from '../../context/AdminContext';
 import adminApi from '../../api/admin';
 import { ShieldCheck, ShieldAlert } from 'lucide-react';
+import PasswordField from '../../components/PasswordField';
 
 export default function AdminLogin() {
   const { adminLogin } = useAdmin();
@@ -68,14 +69,13 @@ export default function AdminLogin() {
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-300 mb-2">Password</label>
-              <input
-                type="password"
-                id="admin-password"
-                required
-                value={form.password}
-                onChange={e => setForm({ ...form, password: e.target.value })}
-                placeholder="••••••••"
-                className="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+              <PasswordField 
+                id="admin-password" 
+                value={form.password} 
+                onChange={e => setForm({ ...form, password: e.target.value })} 
+                placeholder="••••••••" 
+                required 
+                className="bg-gray-800 border-gray-700 text-white focus:ring-emerald-500" 
               />
             </div>
             <button

@@ -38,24 +38,23 @@ const Navbar = () => {
   const linkClass = (path) => {
     const base = 'relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ';
     if (isActive(path)) {
-      return base + 'bg-green-50 text-green-700 font-semibold';
+      return base + 'bg-emerald-600 text-white font-semibold shadow-sm';
     }
-    return base + 'text-gray-500 hover:text-green-600 hover:bg-green-50/60';
+    return base + 'text-emerald-800 hover:text-emerald-900 hover:bg-emerald-200/50';
   };
 
   return (
     <>
-
       {showLogoutModal && (
         <div
           className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
           onClick={() => setShowLogoutModal(false)}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center"
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center border border-emerald-100"
             onClick={e => e.stopPropagation()}
           >
-            <div className="text-green-600 mb-4 flex justify-center">
+            <div className="text-emerald-600 mb-4 flex justify-center">
               <LogOut size={48} />
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Logging out?</h2>
@@ -78,20 +77,19 @@ const Navbar = () => {
         </div>
       )}
 
-      <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
+      <nav className="bg-emerald-50/90 backdrop-blur-md shadow-sm border-b border-emerald-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <Link to={user ? '/dashboard' : '/'} className="flex items-center gap-2 shrink-0">
-              <img src="/logo.png" alt="Greenify" className="h-20 w-20 object-contain" />
-              <span className="font-bold text-2xl text-green-600 tracking-tight">Greenify</span>
+              <img src="/logo.png" alt="Greenify" className="h-14 w-14 object-contain rounded-lg" />
+              <span className="font-bold text-2xl text-emerald-800 tracking-tight">Greenify</span>
             </Link>
-            {/* Desktop Links */}
             <div className="hidden md:flex items-center gap-1">
               {navLinks.map(({ to, label }) => (
                 <Link key={to} to={to} className={linkClass(to)}>
                   {label}
                   {isActive(to) && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-4/5 bg-green-500 rounded-full" />
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-4/5 bg-emerald-600 rounded-full" />
                   )}
                 </Link>
               ))}
@@ -99,7 +97,7 @@ const Navbar = () => {
               {user && (
                 <Link
                   to="/log-action"
-                  className="ml-2 bg-green-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-700 transition shadow-sm flex items-center gap-1.5"
+                  className="ml-2 bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-emerald-700 transition shadow-sm flex items-center gap-1.5"
                 >
                   <Plus size={16} strokeWidth={3} />
                   <span>Log Action</span>
@@ -108,10 +106,10 @@ const Navbar = () => {
 
               {user ? (
                 <>
-                  <div className="w-px h-5 bg-gray-200 mx-2" />
+                  <div className="w-px h-5 bg-emerald-200 mx-2" />
                   <button
                     onClick={() => setShowLogoutModal(true)}
-                    className="text-sm font-medium text-gray-400 hover:text-red-500 transition-colors px-2 py-1.5 rounded-lg hover:bg-red-50"
+                    className="text-sm font-medium text-emerald-600 hover:text-red-500 transition-colors px-2 py-1.5 rounded-lg hover:bg-red-50"
                   >
                     Logout
                   </button>
@@ -119,19 +117,18 @@ const Navbar = () => {
               ) : null}
             </div>
 
-            {/* Mobile Menu Toggle */}
             <div className="flex md:hidden items-center gap-2">
               {user && (
                 <Link
                   to="/log-action"
-                  className="bg-green-600 text-white p-2 rounded-full hover:bg-green-700 transition shadow-sm"
+                  className="bg-emerald-600 text-white p-2 rounded-full hover:bg-emerald-700 transition shadow-sm"
                 >
                   <Plus size={20} strokeWidth={3} />
                 </Link>
               )}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition"
+                className="p-2 text-emerald-700 hover:text-emerald-800 hover:bg-emerald-100 rounded-lg transition"
               >
                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
@@ -139,16 +136,15 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Dropdown Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-100 bg-white">
-            <div className="px-4 py-3 flex flex-col gap-2 shadow-lg rounded-b-xl">
+          <div className="md:hidden border-t border-emerald-100 bg-white">
+            <div className="px-4 py-3 flex flex-col gap-2 shadow-xl rounded-b-xl">
               {navLinks.map(({ to, label }) => (
                 <Link
                   key={to}
                   to={to}
                   className={`px-4 py-3 rounded-xl text-base font-medium transition ${
-                    isActive(to) ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:bg-gray-50'
+                    isActive(to) ? 'bg-emerald-50 text-emerald-700 font-bold' : 'text-emerald-800 hover:bg-emerald-50'
                   }`}
                 >
                   {label}
@@ -157,7 +153,7 @@ const Navbar = () => {
               {user && (
                 <button
                   onClick={() => setShowLogoutModal(true)}
-                  className="w-full text-left px-4 py-3 rounded-xl text-base font-medium text-red-500 hover:bg-red-50 transition mt-2 border-t border-gray-50"
+                  className="w-full text-left px-4 py-3 rounded-xl text-base font-medium text-red-500 hover:bg-red-50 transition mt-2 border-t border-emerald-50"
                 >
                   Logout
                 </button>

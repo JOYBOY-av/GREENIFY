@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../api/axios';
 import { AuthContext } from '../context/AuthContext';
+import PasswordField from '../components/PasswordField';
 
 const getStrength = (pw) => {
   let score = 0;
@@ -278,11 +279,11 @@ const ProfilePanel = ({ onClose }) => {
                   ].map(([field, label, placeholder]) => (
                     <div key={field}>
                       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-                      <input
-                        type="password" placeholder={placeholder} value={cpForm[field]}
-                        onChange={e => setCpForm(f => ({ ...f, [field]: e.target.value }))}
-                        required
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                      <PasswordField 
+                        value={cpForm[field]} 
+                        onChange={e => setCpForm(f => ({ ...f, [field]: e.target.value }))} 
+                        required 
+                        placeholder={placeholder} 
                       />
                       {field === 'newPassword' && cpForm.newPassword && (
                         <div className="mt-2">
@@ -341,12 +342,11 @@ const ProfilePanel = ({ onClose }) => {
                       {[['newPassword', 'New Password'], ['confirmPassword', 'Confirm Password']].map(([field, label]) => (
                         <div key={field}>
                           <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-                          <input
-                            type="password" placeholder="At least 6 characters"
-                            value={otpForm[field]}
-                            onChange={e => setOtpForm(f => ({ ...f, [field]: e.target.value }))}
-                            required
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                          <PasswordField 
+                            value={otpForm[field]} 
+                            onChange={e => setOtpForm(f => ({ ...f, [field]: e.target.value }))} 
+                            required 
+                            placeholder="At least 6 characters" 
                           />
                           {field === 'newPassword' && otpForm.newPassword && (
                             <div className="mt-2">
@@ -428,30 +428,30 @@ const Dashboard = () => {
 
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div className="bg-green-50 w-16 h-16 rounded-full flex items-center justify-center text-green-600">
+          <div className="bg-emerald-50/80 p-6 rounded-2xl shadow-sm border border-emerald-100 flex items-center gap-4">
+            <div className="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center text-emerald-600">
               <Star size={32} fill="currentColor" />
             </div>
             <div>
-              <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Total Points</p>
+              <p className="text-sm text-emerald-700/60 font-medium uppercase tracking-wider">Total Points</p>
               <p className="text-3xl font-bold text-gray-900">{data.total_points}</p>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div className="bg-orange-50 w-16 h-16 rounded-full flex items-center justify-center text-orange-500">
+          <div className="bg-emerald-50/80 p-6 rounded-2xl shadow-sm border border-emerald-100 flex items-center gap-4">
+            <div className="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center text-orange-500">
               <Flame size={32} fill="currentColor" />
             </div>
             <div>
-              <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Active Days</p>
+              <p className="text-sm text-emerald-700/60 font-medium uppercase tracking-wider">Active Days</p>
               <p className="text-3xl font-bold text-gray-900">{data.streak}</p>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center text-blue-600">
+          <div className="bg-emerald-50/80 p-6 rounded-2xl shadow-sm border border-emerald-100 flex items-center gap-4">
+            <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center text-blue-600">
               <Medal size={32} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Badges Earned</p>
+              <p className="text-sm text-emerald-700/60 font-medium uppercase tracking-wider">Badges Earned</p>
               <p className="text-3xl font-bold text-gray-900">{data.badges.length}</p>
             </div>
           </div>
@@ -461,12 +461,12 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Actions</h2>
-            <div className="bg-white shadow-sm border border-gray-100 rounded-2xl overflow-hidden">
+            <div className="bg-emerald-50/80 shadow-sm border border-emerald-100 rounded-2xl overflow-hidden">
               {data.recent_actions.length > 0 ? (
                 <div>
-                  <ul className="divide-y divide-gray-100">
+                  <ul className="divide-y divide-emerald-100">
                     {data.recent_actions.map(action => (
-                      <li key={action.id} className="p-4 sm:px-6 hover:bg-gray-50 transition">
+                      <li key={action.id} className="p-4 sm:px-6 hover:bg-emerald-100/40 transition">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
                             <span className="text-2xl">{action.icon}</span>
@@ -477,41 +477,41 @@ const Dashboard = () => {
                           </div>
                           <div>
                             {action.status === 'rejected' ? (
-                              <div className="font-bold text-red-600 bg-red-50 px-3 py-1 rounded-full text-sm">
+                              <div className="font-bold text-red-600 bg-red-100 px-3 py-1 rounded-full text-sm">
                                 Rejected
                               </div>
                             ) : action.status === 'needs_more_evidence' ? (
-                              <div className="font-bold text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full text-sm">
+                              <div className="font-bold text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full text-sm">
                                 Needs Proof
                               </div>
                             ) : action.status === 'processing' ? (
-                              <div className="font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
+                              <div className="font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full text-sm">
                                 Processing
                               </div>
                             ) : (
-                              <div className="font-bold text-green-600 bg-green-50 px-3 py-1 rounded-full text-sm">
+                              <div className="font-bold text-emerald-600 bg-emerald-100 px-3 py-1 rounded-full text-sm">
                                 +{action.points} pts
                               </div>
                             )}
                           </div>
                         </div>
-                        {action.note && <p className="mt-2 text-sm text-gray-600 ml-10 italic">"{action.note}"</p>}
+                        {action.note && <p className="mt-2 text-sm text-emerald-800/70 ml-10 italic">"{action.note}"</p>}
                         {(action.status === 'rejected' || action.status === 'needs_more_evidence') && action.ai_explanation && (
-                          <div className="mt-2 ml-10 text-xs text-red-500 bg-red-50 p-2 rounded border border-red-100">
+                          <div className="mt-2 ml-10 text-xs text-red-600 p-2 ">
                             <strong>Reason:</strong> {action.ai_explanation}
                           </div>
                         )}
                       </li>
                     ))}
                   </ul>
-                  <div className="p-4 border-t border-gray-100 text-center bg-gray-50 hover:bg-gray-100 transition">
-                    <Link to="/my-actions" className="text-sm font-bold text-green-600 hover:text-green-700">
+                  <div className="p-4 border-t border-emerald-100 text-center bg-emerald-100/20 hover:bg-emerald-100/40 transition">
+                    <Link to="/my-actions" className="text-sm font-bold text-emerald-700 hover:text-emerald-800">
                       View All My Actions &rarr;
                     </Link>
                   </div>
                 </div>
               ) : (
-                <div className="p-8 text-center text-gray-500">
+                <div className="p-8 text-center text-emerald-700/60">
                   <p>No actions logged yet.</p>
                 </div>
               )}
@@ -524,27 +524,27 @@ const Dashboard = () => {
               <h2 className="text-xl font-bold text-gray-900 mb-4">Your Profile</h2>
               <button
                 onClick={() => setShowProfile(true)}
-                className="w-full bg-white border border-gray-100 shadow-sm rounded-2xl p-4 flex items-center gap-4 hover:border-green-200 hover:shadow-md transition text-left"
+                className="w-full bg-emerald-50/80 border border-emerald-100 shadow-sm rounded-2xl p-4 flex items-center gap-4 hover:border-emerald-300 hover:shadow-md transition text-left"
               >
-                <div className="w-14 h-14 rounded-full border-2 border-green-100 overflow-hidden bg-gray-100 flex items-center justify-center shrink-0">
+                <div className="w-14 h-14 rounded-full border-2 border-emerald-200 overflow-hidden bg-emerald-100 flex items-center justify-center shrink-0">
                   {profilePhoto
                     ? <img src={profilePhoto} alt="Me" className="w-full h-full object-cover" />
-                    : <User className="text-gray-300 w-8 h-8" />
+                    : <User className="text-emerald-300 w-8 h-8" />
                   }
                 </div>
                 <div>
                   <p className="font-bold text-gray-900 text-lg">{data.user.name}</p>
-                  <p className="text-sm text-gray-500">{data.user.college}</p>
-                  <p className="text-xs text-green-600 mt-1 font-medium">Edit Profile & Password &rarr;</p>
+                  <p className="text-sm text-emerald-700/60">{data.user.college}</p>
+                  <p className="text-xs text-emerald-600 mt-1 font-medium">Edit Profile & Password &rarr;</p>
                 </div>
               </button>
             </div>
 
             <div className="flex justify-between items-end mb-4">
               <h2 className="text-xl font-bold text-gray-900">Your Badges</h2>
-              <Link to="/badges" className="text-sm font-medium text-green-600 hover:text-green-700 hover:underline">View All &rarr;</Link>
+              <Link to="/badges" className="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline">View All &rarr;</Link>
             </div>
-            <div className="bg-white shadow-sm border border-gray-100 rounded-2xl p-6">
+            <div className="bg-emerald-50/80 shadow-sm border border-emerald-100 rounded-2xl p-6">
               {data.badges.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4">
                   {data.badges.map(badge => (

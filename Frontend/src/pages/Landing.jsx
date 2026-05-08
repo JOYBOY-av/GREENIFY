@@ -58,7 +58,7 @@ const FeatureCard = ({ icon: Icon, title, description, delay }) => (
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, margin: "-50px" }}
     transition={{ duration: 0.8, delay }}
-    className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all border border-emerald-50 group relative z-10"
+    className="bg-emerald-50/90 backdrop-blur-md p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all border border-emerald-100 group relative z-10"
   >
     <div className="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 transition-transform">
       <Icon className="w-8 h-8" />
@@ -256,7 +256,7 @@ const Landing = () => {
   const { user } = useContext(AuthContext);
 
   return (
-    <div className="bg-[#fcfdfa] overflow-hidden font-sans relative">
+    <div className="overflow-hidden font-sans relative">
       
 
       <ScrollyTellingVine />

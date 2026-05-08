@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
+import PasswordField from '../components/PasswordField';
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -50,7 +51,7 @@ const Register = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-sm sm:rounded-2xl border border-gray-100 sm:px-10">
+        <div className="bg-emerald-50/80 py-8 px-4 shadow-sm sm:rounded-2xl border border-emerald-100 sm:px-10 backdrop-blur-sm">
           
           {step === 1 && (
             <form className="space-y-6 animate-fade-in-up" onSubmit={handleRequestOtp}>
@@ -77,9 +78,13 @@ const Register = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">Password</label>
-                <div className="mt-1">
-                  <input name="password" type="password" required minLength="6" value={formData.password} onChange={handleChange} className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" />
-                </div>
+                <PasswordField 
+                  name="password" 
+                  value={formData.password} 
+                  onChange={handleChange} 
+                  required 
+                  minLength="6" 
+                />
               </div>
 
               <div>

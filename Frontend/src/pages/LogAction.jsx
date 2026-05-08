@@ -182,8 +182,8 @@ const LogAction = () => {
                 key={type.id}
                 onClick={() => handleSelectAction(type)}
                 className={`cursor-pointer p-4 rounded-xl border-2 text-center transition ${selectedAction?.id === type.id
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-gray-100 bg-white hover:border-green-200 hover:bg-gray-50'
+                    ? 'border-emerald-500 bg-emerald-100/50'
+                    : 'border-emerald-100 bg-emerald-50/80 hover:border-emerald-200 hover:bg-emerald-100/40'
                   }`}
               >
                 <div className="text-4xl mb-2">{type.icon}</div>
@@ -285,7 +285,7 @@ const LogAction = () => {
             <p className="text-gray-700 mb-4 text-base font-medium">{verificationResult.explanation}</p>
 
             {verificationResult.status === 'verified' && (
-              <div className="bg-white p-4 rounded-lg mb-2 border border-green-100 flex items-center">
+              <div className="bg-emerald-100/50 p-4 rounded-lg mb-2 border border-emerald-200 flex items-center">
                 <p className="text-green-800 font-bold text-lg">Points Awarded: +{verificationResult.points_awarded}</p>
               </div>
             )}

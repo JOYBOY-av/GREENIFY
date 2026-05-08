@@ -23,7 +23,7 @@ const BadgeCard = ({ categoryName, badges, highestLevel }) => {
   return (
     <div
       className={
-        'group relative bg-white rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col overflow-hidden ' +
+        'group relative bg-emerald-50/80 rounded-2xl border border-emerald-100 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col overflow-hidden backdrop-blur-sm ' +
         (highestLevel > 0 ? 'border-yellow-200' : 'border-gray-100')
       }
     >

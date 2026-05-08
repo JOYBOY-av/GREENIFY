@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
+import PasswordField from '../components/PasswordField';
 
 const ForgotPassword = () => {
   const [step, setStep] = useState(1);
@@ -60,7 +61,7 @@ const ForgotPassword = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-sm sm:rounded-2xl border border-gray-100 sm:px-10">
+        <div className="bg-emerald-50/80 py-8 px-4 shadow-sm sm:rounded-2xl border border-emerald-100 sm:px-10 backdrop-blur-sm">
           
           {step === 1 && (
             <form className="space-y-6 animate-fade-in-up" onSubmit={handleRequestOtp}>
@@ -95,9 +96,12 @@ const ForgotPassword = () => {
             <form className="space-y-6 animate-fade-in-up" onSubmit={handleResetPassword}>
               <div>
                 <label className="block text-sm font-medium text-gray-700">New Password</label>
-                <div className="mt-1">
-                  <input type="password" required minLength="6" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500" />
-                </div>
+                <PasswordField 
+                  value={newPassword} 
+                  onChange={(e) => setNewPassword(e.target.value)} 
+                  required 
+                  minLength="6" 
+                />
               </div>
               <button type="submit" disabled={loading} className="w-full py-2.5 px-4 rounded-lg text-white bg-green-600 hover:bg-green-700 disabled:opacity-50">
                 {loading ? 'Resetting...' : 'Set New Password'}

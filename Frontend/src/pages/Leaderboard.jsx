@@ -90,7 +90,7 @@ const Leaderboard = () => {
         </div>
       )}
 
-      <div className="bg-white shadow-sm border border-gray-100 rounded-2xl overflow-hidden">
+      <div className="bg-emerald-50/80 shadow-sm border border-emerald-100 rounded-2xl overflow-hidden backdrop-blur-sm">
         {loading ? (
           <div className="p-8 text-center text-gray-500">Loading rankings...</div>
         ) : (

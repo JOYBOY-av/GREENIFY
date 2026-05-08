@@ -46,7 +46,7 @@ function App() {
             <Route path="/admin/legal"     element={<AdminRoute><AdminLegal /></AdminRoute>} />
 
             <Route path="/*" element={
-              <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900 font-sans relative isolate">
+              <div className="min-h-screen flex flex-col text-gray-900 font-sans relative isolate">
                 <AmbientAnimations />
                 <Navbar />
                 <main className="flex-grow">
